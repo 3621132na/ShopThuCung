@@ -1,5 +1,9 @@
 ﻿@using Shop.Models
 @model List<Giohang>
+
+@{
+    var tongtien = TempData["Tongtien"];
+}
 <div id="offcanvas-cart" class="offcanvas offcanvas-cart">
     <div class="inner">
         <div class="head">
@@ -12,16 +16,22 @@
         </div>
         <div class="body customScroll">
             <ul class="minicart-product-list">
-                @foreach (var item in Model)
+                @if (Model != null)
                 {
-                    <li>
-                        <a href="@Url.Action("ChiTietSanPham", "Sanpham", new { id = item.iMaSp })" class="image"><img src="@item.sAnhbia" alt="Cart product Image"></a>
-                        <div class="content">
-                            <a href="@Url.Action("ChiTietSanPham", "Sanpham", new { id = item.iMaSp })" class="title">@item.sTenSp</a>
-                            <span class="quantity-price">@item.iSoluong X <span class="amount">@String.Format("{0:0,0}", item.dDongia)</span></span>
-                            <a href="#" class="remove">×</a>
-                        </div>
-                    </li>
+                    @foreach (var item in Model.ToList())
+                    {
+                        <li>
+                            <a href="@Url.Action("ChiTietSanPham", "Sanpham", new { id = item.iMaSp })" class="image"><img
+                                    src="@item.sAnhbia" alt="Cart product Image"></a>
+                            <div class="content">
+                                <a href="@Url.Action("ChiTietSanPham", "Sanpham", new { id = item.iMaSp })"
+                                    class="title">@item.sTenSp</a>
+                                <span class="quantity-price">@item.iSoluong X <span class="amount">@String.Format("{0:0,0}",
+                                item.dDongia)</span></span>
+                                <a href="#" class="remove">×</a>
+                            </div>
+                        </li>
+                    }
                 }
             </ul>
         </div>
@@ -31,7 +41,7 @@
                     <tbody>
                         <tr>
                             <td class="text-left">Tổng cộng :</td>
-                            <td class="text-right theme-color">@String.Format("{0:0,0}", ViewBag.Tongtien.ToString("N0"))</td>
+                            <td class="text-right theme-color">@tongtien</td>
                         </tr>
                     </tbody>
                 </table>

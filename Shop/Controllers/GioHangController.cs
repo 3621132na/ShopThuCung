@@ -18,18 +18,17 @@ namespace Shop.Controllers
         {
             List<Giohang> lstGiohang = Laygiohang();
             ViewBag.Tongsoluong = TongSoLuong();
-            ViewBag.Tongtien = TongTien();
-            return PartialView("Index", lstGiohang);
+            TempData["Tongtien"] = "1000000";
+            return View(lstGiohang);
         }
-
 
         public Task<IActionResult> Gia()
         {
-            var tongsoluong =  TongSoLuong();
-            var tongtien =  TongTien();
+            var tongsoluong = TongSoLuong();
+            var tongtien = TongTien();
             ViewBag.Tongsoluong = tongsoluong;
             ViewBag.Tongtien = tongtien;
-            return Task.FromResult<IActionResult>(PartialView("Gia"));
+            return Task.FromResult<IActionResult>(View("Gia"));
         }
 
         public List<Giohang> Laygiohang()
@@ -46,7 +45,7 @@ namespace Shop.Controllers
         public IActionResult ThemGiohang(int iMaSp, string strURL)
         {
             List<Giohang> lstGiohang = Laygiohang();
-            Giohang sanpham = lstGiohang.Find(n => n.iMaSp == iMaSp);
+            Giohang? sanpham = lstGiohang.Find(n => n.iMaSp == iMaSp);
             if (sanpham == null)
             {
                 sanpham = new Giohang(iMaSp);
@@ -102,9 +101,19 @@ namespace Shop.Controllers
         public IActionResult CapnhatGiohang(int iMaSP, [FromForm] FormCollection f)
         {
             List<Giohang> lstGiohang = Laygiohang();
-            Giohang sanpham = lstGiohang.SingleOrDefault(n => n.iMaSp == iMaSP);
+            Giohang? sanpham = lstGiohang.SingleOrDefault(n => n.iMaSp == iMaSP);
             if (sanpham != null)
-                sanpham.iSoluong = int.Parse(f["txtSoluong"].ToString());
+            {
+                int soluong;
+                if (int.TryParse(f["txtSoluong"].ToString(), out soluong))
+                {
+                    sanpham.iSoluong = soluong;
+                }
+                else
+                {
+                    sanpham.iSoluong = 0;
+                }
+            }
 
             HttpContext.Session.Set("Giohang", lstGiohang);
 
@@ -114,7 +123,7 @@ namespace Shop.Controllers
         public IActionResult XoaGiohang(int iMaSP)
         {
             List<Giohang> lstGiohang = Laygiohang();
-            Giohang sanpham = lstGiohang.SingleOrDefault(n => n.iMaSp == iMaSP);
+            Giohang? sanpham = lstGiohang.SingleOrDefault(n => n.iMaSp == iMaSP);
             if (sanpham != null)
             {
                 lstGiohang.RemoveAll(n => n.iMaSp == iMaSP);
@@ -202,7 +211,7 @@ namespace Shop.Controllers
                 ctdh.Soluong = item.iSoluong;
                 ctdh.Dongia = (decimal)item.dDongia;
                 data.Chitietdonthangs.Add(ctdh);
-                Sanpham sp = data.Sanphams.SingleOrDefault(s => s.MaSp == item.iMaSp);
+                Sanpham? sp = data.Sanphams.SingleOrDefault(s => s.MaSp == item.iMaSp);
                 if (sp != null)
                     sp.Soluongton -= item.iSoluong;
             }
@@ -406,16 +415,16 @@ namespace Shop.Controllers
             List<Giohang> lstGiohang = Laygiohang();
             foreach (var chiTiet in chiTietDonHang)
             {
-                Giohang sanpham = lstGiohang.Find(n => n.iMaSp == chiTiet.MaSp);
+                Giohang? sanpham = lstGiohang.Find(n => n.iMaSp == chiTiet.MaSp);
                 if (sanpham == null)
                 {
                     sanpham = new Giohang(chiTiet.MaSp);
-                    sanpham.iSoluong = (int)chiTiet.Soluong;
+                    sanpham.iSoluong = (int)(chiTiet.Soluong ?? 0);
                     lstGiohang.Add(sanpham);
                 }
                 else
                 {
-                    sanpham.iSoluong += (int)chiTiet.Soluong;
+                    sanpham.iSoluong += (int)(chiTiet.Soluong ?? 0);
                 }
             }
 

@@ -18,11 +18,19 @@ namespace Shop.Models
         public Giohang(int MaSp)
         {
             iMaSp = MaSp;
-            Sanpham sp = _context.Sanphams.Single(n => n.MaSp == iMaSp);
-            sTenSp = sp.TenSp;
-            sAnhbia = sp.Anhbia;
-            dDongia = double.Parse(sp.Giaban.ToString());
-            iSoluong = 1;
+            Sanpham sp = null;
+            if (_context != null)
+            {
+                sp = _context.Sanphams.SingleOrDefault(n => n.MaSp == iMaSp);
+
+                if (sp != null)
+                {
+                    sTenSp = sp.TenSp;
+                    sAnhbia = sp.Anhbia;
+                    dDongia = sp.Giaban != null ? double.Parse(sp.Giaban.ToString()) : 0;
+                    iSoluong = 1;
+                }
+            }
         }
     }
 }
